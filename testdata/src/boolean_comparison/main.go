@@ -18,6 +18,15 @@ func main() {
 	var bl bool
 	goqu.C("bool_column").Eq(bl) // want "compare boolean value with int"
 
+	goqu.C("bool_column").IsTrue()  // want `avoid using IsTrue\(\) method, compare boolean value with int`
+	goqu.C("bool_column").IsFalse() // want `avoid using IsFalse\(\) method, compare boolean value with int`
+
+	goqu.I("bool_column").IsTrue()  // want `avoid using IsTrue\(\) method, compare boolean value with int`
+	goqu.I("bool_column").IsFalse() // want `avoid using IsFalse\(\) method, compare boolean value with int`
+
+	goqu.L("bool_column").IsTrue()  // want `avoid using IsTrue\(\) method, compare boolean value with int`
+	goqu.L("bool_column").IsFalse() // want `avoid using IsFalse\(\) method, compare boolean value with int`
+
 	i := 0
 	goqu.C("bool_column").Eq(i)
 

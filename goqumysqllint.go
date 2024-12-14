@@ -53,16 +53,30 @@ func (a *analyzer) checkBooleanExpressionComparison(pass *analysis.Pass, node *a
 	if !strings.HasSuffix(ty.String(), "exp.BooleanExpression") {
 		return
 	}
-	if len(node.Args) != 1 {
+	switch len(node.Args) {
+	case 0:
+		a.checkIsTrueOrFalse(pass, node.Fun)
+	case 1:
+		arg := node.Args[0]
+		argTy := pass.TypesInfo.TypeOf(arg)
+		if argTy.String() != "bool" {
+			return
+		}
+	
+		pass.Reportf(node.Pos(), "compare boolean value with int")
+	}
+}
+
+func (a *analyzer) checkIsTrueOrFalse(pass *analysis.Pass, node ast.Expr) {
+	sel, ok := node.(*ast.SelectorExpr)
+	if !ok {
 		return
 	}
-	arg := node.Args[0]
-	argTy := pass.TypesInfo.TypeOf(arg)
-	if argTy.String() != "bool" {
+	if sel.Sel.Name != "IsTrue" && sel.Sel.Name != "IsFalse" {
 		return
 	}
 
-	pass.Reportf(node.Pos(), "compare boolean value with int")
+	pass.Reportf(node.Pos(), "avoid using %s() method, compare boolean value with int", sel.Sel.Name)
 }
 
 func (a *analyzer) checkGoquExBooleanComparison(pass *analysis.Pass, node *ast.CompositeLit) {
