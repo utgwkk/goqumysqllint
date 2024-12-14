@@ -15,7 +15,7 @@ jobs:
           go-version: stable
       - run: go get -v ./...
       - name: build
-        run: go build
+        run: go build ./cmd/goqumysqllint
   test:
     runs-on: ubuntu-latest
     steps:
