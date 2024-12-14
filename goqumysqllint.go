@@ -34,30 +34,63 @@ func newAnalyzer() (*analyzer, error) {
 func (a *analyzer) run(pass *analysis.Pass) (interface{}, error) {
 	it := pass.ResultOf[inspect.Analyzer].(*inspector.Inspector).PreorderSeq(
 		new(ast.CallExpr),
+		new(ast.CompositeLit),
 	)
 
 	for node := range it {
-		node, ok := node.(*ast.CallExpr)
+		switch node := node.(type) {
+		case *ast.CallExpr:
+			a.checkBooleanExpressionComparison(pass, node)
+		case *ast.CompositeLit:
+			a.checkGoquExBooleanComparison(pass, node)
+		}
+	}
+	return nil, nil
+}
+
+func (a *analyzer) checkBooleanExpressionComparison(pass *analysis.Pass, node *ast.CallExpr) {
+	ty := pass.TypesInfo.TypeOf(node)
+	if !strings.HasSuffix(ty.String(), "exp.BooleanExpression") {
+		return
+	}
+	if len(node.Args) != 1 {
+		return
+	}
+	arg := node.Args[0]
+	argTy := pass.TypesInfo.TypeOf(arg)
+	if argTy.String() != "bool" {
+		return
+	}
+
+	pass.Reportf(node.Pos(), "compare boolean value with int")
+}
+
+func (a *analyzer) checkGoquExBooleanComparison(pass *analysis.Pass, node *ast.CompositeLit) {
+	selector, ok := node.Type.(*ast.SelectorExpr)
+	if !ok {
+		return
+	}
+	xIdent, ok := selector.X.(*ast.Ident)
+	if !ok {
+		return
+	}
+	if !(xIdent.Name == "goqu" || xIdent.Name == "exp") {
+		return
+	}
+	if !(selector.Sel.Name == "Ex" || selector.Sel.Name == "ExOr") {
+		return
+	}
+	for _, elt := range node.Elts {
+		kvExpr, ok := elt.(*ast.KeyValueExpr)
 		if !ok {
 			continue
 		}
-		ty := pass.TypesInfo.TypeOf(node)
-		if !strings.HasSuffix(ty.String(), "exp.BooleanExpression") {
-			continue
-		}
-		if len(node.Args) != 1 {
-			continue
-		}
-		arg := node.Args[0]
-		argTy := pass.TypesInfo.TypeOf(arg)
-		if argTy.String() != "bool" {
+		v := kvExpr.Value
+		vTy := pass.TypesInfo.TypeOf(v)
+		if vTy.String() != "bool" {
 			continue
 		}
 
-		pass.Report(analysis.Diagnostic{
-			Pos:     node.Pos(),
-			Message: "compare boolean value with int",
-		})
+		pass.Reportf(node.Pos(), "compare boolean value with int")
 	}
-	return nil, nil
 }
