@@ -2,6 +2,7 @@ package goqumysqllint
 
 import (
 	"go/ast"
+	"strings"
 
 	_ "github.com/doug-martin/goqu/v9" // for lookup types
 	"golang.org/x/tools/go/analysis"
@@ -24,10 +25,6 @@ func NewAnalyzer(_ any) (*analysis.Analyzer, error) {
 	}, nil
 }
 
-const (
-	booleanExpressionFullTypeName = "github.com/doug-martin/goqu/v9/exp.BooleanExpression"
-)
-
 type analyzer struct{}
 
 func newAnalyzer() (*analyzer, error) {
@@ -45,7 +42,7 @@ func (a *analyzer) run(pass *analysis.Pass) (interface{}, error) {
 			continue
 		}
 		ty := pass.TypesInfo.TypeOf(node)
-		if ty.String() != booleanExpressionFullTypeName {
+		if !strings.HasSuffix(ty.String(), "exp.BooleanExpression") {
 			continue
 		}
 		if len(node.Args) != 1 {
