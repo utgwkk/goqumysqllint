@@ -38,4 +38,9 @@ func main() {
 
 	_ = goqu.ExOr{"bool_column": true} // want `avoid comparing with boolean value, compare with integer`
 	_ = goqu.ExOr{"bool_column": goqu.L("TRUE")}
+
+	_ = goqu.ExOr{
+		"bool_column": true, // want `avoid comparing with boolean value, compare with integer`
+		"int_column":  1,
+	}
 }

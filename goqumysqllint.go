@@ -63,7 +63,7 @@ func (a *analyzer) checkBooleanExpressionComparison(pass *analysis.Pass, node *a
 			return
 		}
 
-		pass.Reportf(node.Pos(), "avoid comparing with boolean value, compare with integer")
+		pass.Reportf(arg.Pos(), "avoid comparing with boolean value, compare with integer")
 	}
 }
 
@@ -76,7 +76,7 @@ func (a *analyzer) checkIsTrueOrFalse(pass *analysis.Pass, node ast.Expr) {
 		return
 	}
 
-	pass.Reportf(node.Pos(), "avoid using %s() method, compare with integer", sel.Sel.Name)
+	pass.Reportf(sel.Sel.Pos(), "avoid using %s() method, compare with integer", sel.Sel.Name)
 }
 
 func (a *analyzer) checkGoquExBooleanComparison(pass *analysis.Pass, node *ast.CompositeLit) {
@@ -105,6 +105,6 @@ func (a *analyzer) checkGoquExBooleanComparison(pass *analysis.Pass, node *ast.C
 			continue
 		}
 
-		pass.Reportf(node.Pos(), "avoid comparing with boolean value, compare with integer")
+		pass.Reportf(kvExpr.Value.Pos(), "avoid comparing with boolean value, compare with integer")
 	}
 }
