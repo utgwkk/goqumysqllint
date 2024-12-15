@@ -20,7 +20,7 @@ $ go vet -vettool=`which goqumysqllint` ./...
 You can use goqumysqllint via [golangci-lint's module plugin system](https://golangci-lint.run/plugins/module-plugins/).
 
 ```yaml
-version: v1.62.2
+version: latest
 plugins:
   - module: 'github.com/utgwkk/goqumysqllint'
     version: latest
