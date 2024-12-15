@@ -4,6 +4,7 @@ go 1.23.4
 
 require (
 	github.com/doug-martin/goqu/v9 v9.19.0
+	github.com/golangci/plugin-module-register v0.1.1
 	github.com/gostaticanalysis/testutil v0.5.2
 	golang.org/x/tools v0.28.0
 )
