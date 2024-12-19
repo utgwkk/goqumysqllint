@@ -22,7 +22,7 @@ You can use goqumysqllint via [golangci-lint's module plugin system](https://gol
 In .custom-gcl.yml:
 
 ```yaml
-version: latest
+version: v1.62.2 # or specify 'master' to always build latest but maybe unstable version
 plugins:
   - module: 'github.com/utgwkk/goqumysqllint'
     version: latest
